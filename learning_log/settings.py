@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -7,20 +8,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ...
 
 # Database
-if os.getcwd() == '/app':
-    import dj_database_url
+if 'DATABASE_URL' in os.environ:
     DATABASES = {
-        'default': dj_database_url.config(default='postgres://localhost')
+        'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure().
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow all host headers.
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['www.learning_log.com']  # Replace with your actual domain
 
 # Static asset configuration
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -34,12 +41,10 @@ STATIC_URL = '/static/'
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&=2oi%ibj%l5@90)^*4a_&39j9gt)iq#)4sayp&i!b#sf=8^4j'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+DEBUG = False
 
 # Application definition
 
@@ -89,17 +94,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'learning_log.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -133,3 +127,4 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https
+
